@@ -175,7 +175,43 @@ namespace Project14 {
 
         void buttonRegister_Click(System::Object^ sender, System::EventArgs^ e)
         {
-            
+            String^ username = textBoxUsername->Text;
+            String^ password = textBoxPassword->Text;
+            try
+            {
+                TcpClient^ client = gcnew TcpClient("127.0.0.1", 1234);
+                NetworkStream^ stream = client->GetStream();
+
+                String^ loginData = "register_request:" + username + ":" + password;
+                array<Byte>^ sendData = Encoding::UTF8->GetBytes(loginData);
+
+                // ќтправка данных на сервер
+                stream->Write(sendData, 0, sendData->Length);
+
+                // ѕолучение ответа от сервера
+                array<Byte>^ buffer = gcnew array<Byte>(1024);
+                int bytesRead = stream->Read(buffer, 0, buffer->Length);
+                String^ response = Encoding::UTF8->GetString(buffer, 0, bytesRead);
+
+                // ќбработка полученного ответа
+                if (response == "Registration successful")
+                {
+                    // ¬ход успешен, открываем форму чата (ClientForm)
+                    labelResultLogin->Text = "нова€ учетна€ запись создана";
+                }
+                else if (response == "Username already exists")
+                {
+                    // Ќеверные учетные данные, обработайте соответственно
+                    labelResultLogin->Text = "пользователь с таким именем уже существует";
+                }
+
+                client->Close();
+            }
+            catch (Exception^ ex)
+            {
+                // ќбработка ошибок соединени€ с сервером
+                MessageBox::Show("Error connecting to the server: " + ex->Message);
+            }
         }
 
         
