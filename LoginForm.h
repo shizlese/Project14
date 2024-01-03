@@ -10,13 +10,14 @@ namespace Project14 {
     public ref class LoginForm : public System::Windows::Forms::Form
     {
     public:
-        String^ usernameG;
+        
         LoginForm()
         {
             InitializeComponent();
-
+            
         }
-
+    public: 
+        String^ CurrentUsername;
     protected:
         ~LoginForm()
         {
@@ -154,6 +155,7 @@ namespace Project14 {
                 if (response == "Login successful")
                 {
                     // ¬ход успешен, открываем форму чата (ClientForm)
+                    CurrentUsername = username;
                     ClientForm^ clientForm = gcnew ClientForm();
                     clientForm->Show();
                     this->Hide(); // —крываем форму входа
@@ -161,7 +163,7 @@ namespace Project14 {
                 else if (response == "Login failed")
                 {
                     // Ќеверные учетные данные, обработайте соответственно
-                    MessageBox::Show("Login failed. Please check your credentials.");
+                    labelResultLogin->Text = ("неверный логин или пароль");
                 }
 
                 client->Close();
@@ -169,7 +171,7 @@ namespace Project14 {
                 catch (Exception^ ex)
             {
                 // ќбработка ошибок соединени€ с сервером
-                MessageBox::Show("Error connecting to the server: " + ex->Message);
+                    labelResultLogin->Text=("Error connecting to the server: " + ex->Message);
             }
         }
 
@@ -197,7 +199,7 @@ namespace Project14 {
                 if (response == "Registration successful")
                 {
                     // ¬ход успешен, открываем форму чата (ClientForm)
-                    labelResultLogin->Text = "нова€ учетна€ запись создана";
+                    labelResultLogin->Text = "новый пользователь успешно создан";
                 }
                 else if (response == "Username already exists")
                 {
@@ -210,7 +212,7 @@ namespace Project14 {
             catch (Exception^ ex)
             {
                 // ќбработка ошибок соединени€ с сервером
-                MessageBox::Show("Error connecting to the server: " + ex->Message);
+                labelResultLogin->Text=("Error connecting to the server: " + ex->Message);
             }
         }
 
