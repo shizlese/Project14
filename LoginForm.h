@@ -6,12 +6,15 @@ namespace Project14 {
     using namespace System;
     using namespace System::Windows::Forms;
     using namespace System::Data::SqlClient;
+    using namespace System::Threading::Tasks;
     public ref class LoginForm : public System::Windows::Forms::Form
     {
     public:
+        String^ usernameG;
         LoginForm()
         {
             InitializeComponent();
+
         }
 
     protected:
@@ -24,11 +27,18 @@ namespace Project14 {
         }
 
     private:
+        TcpClient^ client;
         System::ComponentModel::Container^ components;
         System::Windows::Forms::TextBox^ textBoxUsername;
         System::Windows::Forms::TextBox^ textBoxPassword;
         System::Windows::Forms::Button^ buttonLogin;
-        System::Windows::Forms::Button^ buttonRegister;
+    private: System::Windows::Forms::Label^ label1;
+    private: System::Windows::Forms::Label^ label2;
+    private: System::Windows::Forms::Label^ labelResultLogin;
+           System::Windows::Forms::Button^ buttonRegister;
+           bool sendCompleted;
+           bool receiveCompleted;
+           String^ serverResponse;
 
         void InitializeComponent()
         {
@@ -36,11 +46,14 @@ namespace Project14 {
             this->textBoxPassword = (gcnew System::Windows::Forms::TextBox());
             this->buttonLogin = (gcnew System::Windows::Forms::Button());
             this->buttonRegister = (gcnew System::Windows::Forms::Button());
+            this->label1 = (gcnew System::Windows::Forms::Label());
+            this->label2 = (gcnew System::Windows::Forms::Label());
+            this->labelResultLogin = (gcnew System::Windows::Forms::Label());
             this->SuspendLayout();
             // 
             // textBoxUsername
             // 
-            this->textBoxUsername->Location = System::Drawing::Point(12, 12);
+            this->textBoxUsername->Location = System::Drawing::Point(96, 85);
             this->textBoxUsername->Name = L"textBoxUsername";
             this->textBoxUsername->Size = System::Drawing::Size(200, 20);
             this->textBoxUsername->TabIndex = 0;
@@ -48,16 +61,14 @@ namespace Project14 {
             // 
             // textBoxPassword
             // 
-            this->textBoxPassword->Location = System::Drawing::Point(12, 38);
+            this->textBoxPassword->Location = System::Drawing::Point(96, 134);
             this->textBoxPassword->Name = L"textBoxPassword";
-            this->textBoxPassword->PasswordChar = '*';
             this->textBoxPassword->Size = System::Drawing::Size(200, 20);
             this->textBoxPassword->TabIndex = 1;
-            this->textBoxPassword->Text = L"Enter password";
             // 
             // buttonLogin
             // 
-            this->buttonLogin->Location = System::Drawing::Point(12, 64);
+            this->buttonLogin->Location = System::Drawing::Point(146, 160);
             this->buttonLogin->Name = L"buttonLogin";
             this->buttonLogin->Size = System::Drawing::Size(100, 23);
             this->buttonLogin->TabIndex = 2;
@@ -67,7 +78,7 @@ namespace Project14 {
             // 
             // buttonRegister
             // 
-            this->buttonRegister->Location = System::Drawing::Point(112, 64);
+            this->buttonRegister->Location = System::Drawing::Point(146, 189);
             this->buttonRegister->Name = L"buttonRegister";
             this->buttonRegister->Size = System::Drawing::Size(100, 23);
             this->buttonRegister->TabIndex = 3;
@@ -75,76 +86,104 @@ namespace Project14 {
             this->buttonRegister->UseVisualStyleBackColor = true;
             this->buttonRegister->Click += gcnew System::EventHandler(this, &LoginForm::buttonRegister_Click);
             // 
+            // label1
+            // 
+            this->label1->AutoSize = true;
+            this->label1->Location = System::Drawing::Point(96, 59);
+            this->label1->Name = L"label1";
+            this->label1->Size = System::Drawing::Size(80, 13);
+            this->label1->TabIndex = 4;
+            this->label1->Text = L"enter username";
+            // 
+            // label2
+            // 
+            this->label2->AutoSize = true;
+            this->label2->Location = System::Drawing::Point(96, 112);
+            this->label2->Name = L"label2";
+            this->label2->Size = System::Drawing::Size(79, 13);
+            this->label2->TabIndex = 5;
+            this->label2->Text = L"enter password";
+            // 
+            // labelResultLogin
+            // 
+            this->labelResultLogin->AutoSize = true;
+            this->labelResultLogin->Location = System::Drawing::Point(96, 31);
+            this->labelResultLogin->Name = L"labelResultLogin";
+            this->labelResultLogin->Size = System::Drawing::Size(0, 13);
+            this->labelResultLogin->TabIndex = 6;
+            // 
             // LoginForm
             // 
-            this->ClientSize = System::Drawing::Size(341, 178);
+            this->ClientSize = System::Drawing::Size(396, 233);
+            this->Controls->Add(this->labelResultLogin);
+            this->Controls->Add(this->label2);
+            this->Controls->Add(this->label1);
             this->Controls->Add(this->textBoxUsername);
             this->Controls->Add(this->textBoxPassword);
             this->Controls->Add(this->buttonLogin);
             this->Controls->Add(this->buttonRegister);
             this->Name = L"LoginForm";
             this->Text = L"Login / Register";
+            this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &LoginForm::LoginForm_FormClosed);
+            this->Load += gcnew System::EventHandler(this, &LoginForm::LoginForm_Load);
             this->ResumeLayout(false);
             this->PerformLayout();
 
         }
-        bool IsLoginValid(String^ username, String^ password)
+        void buttonLogin_Click(System::Object^ sender, System::EventArgs^ e)
         {
-            // Ваша логика проверки учетных данных в базе данных
+            String^ username = textBoxUsername->Text;
+            String^ password = textBoxPassword->Text;
             try
             {
-                String^ connectionString = "Data Source=your_server;Initial Catalog=your_database;Integrated Security=True";
-                SqlConnection^ connection = gcnew SqlConnection(connectionString);
-                connection->Open();
+                TcpClient ^ client = gcnew TcpClient("127.0.0.1", 1234);
+                NetworkStream^ stream = client->GetStream();
 
-                // Защита от SQL-инъекций - лучше использовать параметризованные запросы
-                String^ query = "SELECT * FROM users WHERE username = @username AND password = @password";
-                SqlCommand^ command = gcnew SqlCommand(query, connection);
-                command->Parameters->AddWithValue("@username", username);
-                command->Parameters->AddWithValue("@password", password);
+                String^ loginData = "login_request:" + username + ":" + password;
+                array<Byte>^ sendData = Encoding::UTF8->GetBytes(loginData);
 
-                SqlDataReader^ reader = command->ExecuteReader();
+                // Отправка данных на сервер
+                stream->Write(sendData, 0, sendData->Length);
 
-                if (reader->HasRows)
+                // Получение ответа от сервера
+                array<Byte>^ buffer = gcnew array<Byte>(1024);
+                int bytesRead = stream->Read(buffer, 0, buffer->Length);
+                String^ response = Encoding::UTF8->GetString(buffer, 0, bytesRead);
+
+                // Обработка полученного ответа
+                if (response == "Login successful")
                 {
-                    // Вход успешен
-                    reader->Close();
-                    connection->Close();
-                    return true;
+                    // Вход успешен, открываем форму чата (ClientForm)
+                    ClientForm^ clientForm = gcnew ClientForm();
+                    clientForm->Show();
+                    this->Hide(); // Скрываем форму входа
                 }
-                else
+                else if (response == "Login failed")
                 {
-                    // Неверный логин или пароль
-                    reader->Close();
-                    connection->Close();
-                    return false;
+                    // Неверные учетные данные, обработайте соответственно
+                    MessageBox::Show("Login failed. Please check your credentials.");
                 }
+
+                client->Close();
             }
-            catch (Exception^ ex)
+                catch (Exception^ ex)
             {
-                // Обработка ошибок подключения к базе данных
-                Console::WriteLine(ex->Message);
-                return false;
+                // Обработка ошибок соединения с сервером
+                MessageBox::Show("Error connecting to the server: " + ex->Message);
             }
         }
 
-        System::Void buttonLogin_Click(System::Object^ sender, System::EventArgs^ e)
+        void buttonRegister_Click(System::Object^ sender, System::EventArgs^ e)
         {
-            // Добавьте здесь код для обработки входа пользователя
-            // Проверьте учетные данные введенные в textBoxUsername и textBoxPassword
-            // Если вход успешен, откройте новую форму чата и закройте текущую форму
-            this->Hide(); // Скрыть текущую форму
-
-            Project14::ClientForm^ chatForm = gcnew ClientForm();
-            chatForm->ShowDialog();
-
-            this->Close(); // Закрыть текущую форму после успешного входа
+            
         }
 
-        System::Void buttonRegister_Click(System::Object^ sender, System::EventArgs^ e)
-        {
-            Project14::RegistrationForm^ registrationForm = gcnew RegistrationForm();
-            registrationForm->ShowDialog();
-        }
-    };
+        
+private: System::Void LoginForm_FormClosed(System::Object^ sender, System::Windows::Forms::FormClosedEventArgs^ e) {
+        
+    }
+private: System::Void LoginForm_Load(System::Object^ sender, System::EventArgs^ e) {
+
 }
+};
+};
