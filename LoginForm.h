@@ -1,23 +1,24 @@
 #pragma once
 #include "ClientForm.h"
 #include "RegistrationForm.h"
+#include "Global.h"
 namespace Project14 {
 
     using namespace System;
     using namespace System::Windows::Forms;
     using namespace System::Data::SqlClient;
     using namespace System::Threading::Tasks;
+    using namespace Global;
     public ref class LoginForm : public System::Windows::Forms::Form
     {
     public:
-        
         LoginForm()
         {
             InitializeComponent();
             
         }
     public: 
-        String^ CurrentUsername;
+        
     protected:
         ~LoginForm()
         {
@@ -28,6 +29,7 @@ namespace Project14 {
         }
 
     private:
+        
         TcpClient^ client;
         System::ComponentModel::Container^ components;
         System::Windows::Forms::TextBox^ textBoxUsername;
@@ -154,8 +156,10 @@ namespace Project14 {
                 // Обработка полученного ответа
                 if (response == "Login successful")
                 {
+
+                    GlobalData::CurrentUser = username;
+
                     // Вход успешен, открываем форму чата (ClientForm)
-                    CurrentUsername = username;
                     ClientForm^ clientForm = gcnew ClientForm();
                     clientForm->Show();
                     this->Hide(); // Скрываем форму входа

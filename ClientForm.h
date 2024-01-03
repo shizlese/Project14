@@ -1,17 +1,29 @@
 #pragma once
 #include "ClientForm.cpp"
+#include "Global.h"
 namespace Project14 {
     using namespace System;
     using namespace System::Net;
     using namespace System::Net::Sockets;
     using namespace System::Text;
     using namespace Microsoft::VisualBasic;
+    using namespace Global;
     public ref class ClientForm : public System::Windows::Forms::Form
     {
     public:
         ClientForm()
         {
             InitializeComponent();
+            
+            client = gcnew TcpClient("127.0.0.1", 1234);
+            stream = client->GetStream();
+
+            if (client == nullptr || stream == nullptr)
+            {
+                // Обработка ошибки инициализации
+                System::Windows::Forms::MessageBox::Show("Failed to initialize the client or stream.");
+                // Завершаем работу формы или принимаем другие меры по обработке ошибки
+            }
         }
 
     protected:
@@ -130,6 +142,43 @@ namespace Project14 {
             this->PerformLayout();
 
         }
+        public:
+            String^ currentUser = GlobalData::CurrentUser;
+            delegate void UpdateChatBoxDelegate(String^ message);
+            delegate void DisplayMessageDelegate(String^ sender, String^ message, bool isCurrentClient);
+
+            
+
+        void UpdateChatBox(String^ message) {
+            // Выполните действия обновления интерфейса в главном потоке
+            if (richTextBoxChat->InvokeRequired) {
+                Invoke(gcnew UpdateChatBoxDelegate(this, &ClientForm::UpdateChatBox), message);
+            }
+            else {
+                richTextBoxChat->AppendText(message + "\n");
+            }
+        }
+
+        void DisplayMessage(String^ sender, String^ message, bool isCurrentClient) {
+            String^ formattedMessage;
+
+            // Форматирование сообщения с учетом выравнивания
+            if (isCurrentClient) {
+                formattedMessage = String::Format("[You] {0} ({1}): {2}", sender, DateTime::Now.ToString("HH:mm:ss"), message);
+            }
+            else {
+                formattedMessage = String::Format("[{0}] {1} ({2}): {3}", sender, DateTime::Now.ToString("HH:mm:ss"), message);
+            }
+
+            // Добавление сообщения в richTextBoxChat с учетом выравнивания
+            if (richTextBoxChat->InvokeRequired) {
+                DisplayMessageDelegate^ displayDelegate = gcnew DisplayMessageDelegate(this, &ClientForm::DisplayMessage);
+                BeginInvoke(displayDelegate, sender, message, isCurrentClient);
+            }
+            else {
+                richTextBoxChat->AppendText(formattedMessage + "\n");
+            }
+        }
         void FillChatList() {
             String^ condition = "";
             String^ value = comboBoxChat->Text;
@@ -174,9 +223,10 @@ namespace Project14 {
             String^ message = textBoxMessage->Text;
             array<Byte>^ data = Encoding::UTF8->GetBytes(message);
             stream->Write(data, 0, data->Length);
-
+            DisplayMessage(currentUser, message, true);
             // Добавьте здесь код для обработки полученного ответа от сервера (если необходимо)
             textBoxMessage->Clear();
+           
         }
 
         // Вставьте следующие строки для компонентов формы
