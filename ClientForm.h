@@ -1,5 +1,6 @@
 #pragma once
 #include "ClientForm.cpp"
+#include "Global.h"
 namespace Project14 {
     using namespace System;
     using namespace System::Net;
@@ -24,16 +25,15 @@ namespace Project14 {
         }
 
     private:
-        TcpClient^ client;
-        NetworkStream^ stream;
 
         System::Windows::Forms::TextBox^ textBoxMessage;
         System::Windows::Forms::Button^ buttonSend;
     private: System::Windows::Forms::ComboBox^ comboBoxChat;
 
     private: System::Windows::Forms::Label^ label1;
-    private: System::Windows::Forms::Button^ joinChatButton;
+
     private: System::Windows::Forms::Button^ createChatButton;
+    private: System::Windows::Forms::Label^ CurrentChat;
 
 
            System::Windows::Forms::RichTextBox^ richTextBoxChat;
@@ -45,8 +45,8 @@ namespace Project14 {
             this->richTextBoxChat = (gcnew System::Windows::Forms::RichTextBox());
             this->comboBoxChat = (gcnew System::Windows::Forms::ComboBox());
             this->label1 = (gcnew System::Windows::Forms::Label());
-            this->joinChatButton = (gcnew System::Windows::Forms::Button());
             this->createChatButton = (gcnew System::Windows::Forms::Button());
+            this->CurrentChat = (gcnew System::Windows::Forms::Label());
             this->SuspendLayout();
             // 
             // textBoxMessage
@@ -78,31 +78,22 @@ namespace Project14 {
             // comboBoxChat
             // 
             this->comboBoxChat->FormattingEnabled = true;
-            this->comboBoxChat->Location = System::Drawing::Point(6, 24);
+            this->comboBoxChat->Location = System::Drawing::Point(6, 49);
             this->comboBoxChat->Name = L"comboBoxChat";
             this->comboBoxChat->Size = System::Drawing::Size(121, 21);
             this->comboBoxChat->TabIndex = 3;
             this->comboBoxChat->DropDown += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_DropDown);
             this->comboBoxChat->SelectedIndexChanged += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_SelectedIndexChanged);
+            this->comboBoxChat->DropDownClosed += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_DropDownClosed);
             // 
             // label1
             // 
             this->label1->AutoSize = true;
-            this->label1->Location = System::Drawing::Point(7, 5);
+            this->label1->Location = System::Drawing::Point(31, 24);
             this->label1->Name = L"label1";
             this->label1->Size = System::Drawing::Size(65, 13);
             this->label1->TabIndex = 4;
             this->label1->Text = L"Выбор чата";
-            // 
-            // joinChatButton
-            // 
-            this->joinChatButton->Location = System::Drawing::Point(6, 213);
-            this->joinChatButton->Name = L"joinChatButton";
-            this->joinChatButton->Size = System::Drawing::Size(117, 20);
-            this->joinChatButton->TabIndex = 5;
-            this->joinChatButton->Text = L"присоедениться";
-            this->joinChatButton->UseVisualStyleBackColor = true;
-            this->joinChatButton->Click += gcnew System::EventHandler(this, &ClientForm::joinButton_Click);
             // 
             // createChatButton
             // 
@@ -114,11 +105,19 @@ namespace Project14 {
             this->createChatButton->UseVisualStyleBackColor = true;
             this->createChatButton->Click += gcnew System::EventHandler(this, &ClientForm::createChatButton_Click);
             // 
+            // CurrentChat
+            // 
+            this->CurrentChat->AutoSize = true;
+            this->CurrentChat->Location = System::Drawing::Point(133, 5);
+            this->CurrentChat->Name = L"CurrentChat";
+            this->CurrentChat->Size = System::Drawing::Size(0, 13);
+            this->CurrentChat->TabIndex = 7;
+            // 
             // ClientForm
             // 
             this->ClientSize = System::Drawing::Size(504, 350);
+            this->Controls->Add(this->CurrentChat);
             this->Controls->Add(this->createChatButton);
-            this->Controls->Add(this->joinChatButton);
             this->Controls->Add(this->label1);
             this->Controls->Add(this->comboBoxChat);
             this->Controls->Add(this->textBoxMessage);
@@ -171,11 +170,27 @@ namespace Project14 {
 
         System::Void buttonSend_Click(System::Object^ sender, System::EventArgs^ e)
         {
-            String^ message = textBoxMessage->Text;
-            array<Byte>^ data = Encoding::UTF8->GetBytes(message);
-            stream->Write(data, 0, data->Length);
-
-            // Добавьте здесь код для обработки полученного ответа от сервера (если необходимо)
+            
+            try 
+            {
+                TcpClient^ client = gcnew TcpClient("127.0.0.1", 1234);
+                NetworkStream^ stream = client->GetStream();
+                if (stream != nullptr) {
+                    
+                    String^ message = "send_message_request:" + comboBoxChat->Text + ":" + Global::GlobalData::CurrentUser + ":" + textBoxMessage->Text;
+                    array<Byte>^ messageBytes = Encoding::UTF8->GetBytes(message);
+                    stream->Write(messageBytes, 0, messageBytes->Length);
+                    stream->Flush();
+                }
+                else {
+                    Console::WriteLine("Error: networkStream is null");
+                }
+            }
+			catch (Exception^ ex) {
+				Console::WriteLine("Error: " + ex->Message);
+			}
+            
+            // Очистка TextBox после отправки сообщения
             textBoxMessage->Clear();
         }
 
@@ -223,6 +238,9 @@ private: System::Void createChatButton_Click(System::Object^ sender, System::Eve
             // Добавьте обработку ошибок при подключении к серверу или отправке данных
         }
     }
+}
+private: System::Void comboBoxChat_DropDownClosed(System::Object^ sender, System::EventArgs^ e) {
+    CurrentChat->Text = "Чат " + comboBoxChat->Text;
 }
 };
 }

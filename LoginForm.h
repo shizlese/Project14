@@ -1,6 +1,7 @@
 #pragma once
 #include "ClientForm.h"
 #include "RegistrationForm.h"
+#include "Global.h"
 namespace Project14 {
 
     using namespace System;
@@ -16,8 +17,6 @@ namespace Project14 {
             InitializeComponent();
             
         }
-    public: 
-        String^ CurrentUsername;
     protected:
         ~LoginForm()
         {
@@ -155,7 +154,7 @@ namespace Project14 {
                 if (response == "Login successful")
                 {
                     // ¬ход успешен, открываем форму чата (ClientForm)
-                    CurrentUsername = username;
+                    Global::GlobalData::CurrentUser = username;
                     ClientForm^ clientForm = gcnew ClientForm();
                     clientForm->Show();
                     this->Hide(); // —крываем форму входа
