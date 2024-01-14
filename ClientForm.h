@@ -44,7 +44,6 @@ namespace Project14 {
                this->textBoxMessage = (gcnew System::Windows::Forms::TextBox());
                this->buttonSend = (gcnew System::Windows::Forms::Button());
                this->richTextBoxChat = (gcnew System::Windows::Forms::RichTextBox());
-               this->richTextBoxChat->Font = gcnew System::Drawing::Font("Arial",8); // Замените "Arial" на шрифт, поддерживающий кириллицу
                this->comboBoxChat = (gcnew System::Windows::Forms::ComboBox());
                this->label1 = (gcnew System::Windows::Forms::Label());
                this->createChatButton = (gcnew System::Windows::Forms::Button());
@@ -65,12 +64,13 @@ namespace Project14 {
                this->buttonSend->Name = L"buttonSend";
                this->buttonSend->Size = System::Drawing::Size(75, 20);
                this->buttonSend->TabIndex = 1;
-               this->buttonSend->Text = L"Send";
+               this->buttonSend->Text = L"Отправить";
                this->buttonSend->UseVisualStyleBackColor = true;
                this->buttonSend->Click += gcnew System::EventHandler(this, &ClientForm::buttonSend_Click);
                // 
                // richTextBoxChat
                // 
+               this->richTextBoxChat->Font = (gcnew System::Drawing::Font(L"Arial", 8));
                this->richTextBoxChat->Location = System::Drawing::Point(133, 24);
                this->richTextBoxChat->Name = L"richTextBoxChat";
                this->richTextBoxChat->ReadOnly = true;
@@ -122,7 +122,7 @@ namespace Project14 {
                this->updateChatButton->Name = L"updateChatButton";
                this->updateChatButton->Size = System::Drawing::Size(75, 23);
                this->updateChatButton->TabIndex = 8;
-               this->updateChatButton->Text = L"update";
+               this->updateChatButton->Text = L"обновить";
                this->updateChatButton->UseVisualStyleBackColor = true;
                this->updateChatButton->Click += gcnew System::EventHandler(this, &ClientForm::updateChatButton_Click);
                // 
@@ -138,11 +138,12 @@ namespace Project14 {
                this->Controls->Add(this->buttonSend);
                this->Controls->Add(this->richTextBoxChat);
                this->Name = L"ClientForm";
-               this->Text = L"Socket Client";
+               this->Text = L"Чат";
                this->ResumeLayout(false);
                this->PerformLayout();
 
            }
+
            void FillChatList() {
                String^ condition = "";
                String^ value = comboBoxChat->Text;
@@ -275,9 +276,20 @@ namespace Project14 {
                 {
 
                         array<String^>^ messages = response->Split('\n');
-                        for each (String ^ message in messages)
-                        {
-                            richTextBoxChat->Text += message + "\n";
+                        for each (String ^ message in messages) {
+                            array<String^>^ parts = message->Split(':');
+
+                            // Проверяем, начинается ли сообщение с "message:"
+                            if (parts->Length >= 4 && parts[0] == "message") {
+                                // Удаляем префикс "message:" и получаем оставшуюся часть сообщения
+                                String^ textWithoutPrefix = String::Join(":", parts, 1, parts->Length - 1);
+
+                                // Определяем отправителя сообщения
+                                String^ sender = parts[1];
+
+                                // Добавляем сообщение в RichTextBox
+                                richTextBoxChat->AppendText(textWithoutPrefix + "\n");
+                            }
                         }
                 }   
         }

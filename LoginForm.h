@@ -57,7 +57,6 @@ namespace Project14 {
             this->textBoxUsername->Name = L"textBoxUsername";
             this->textBoxUsername->Size = System::Drawing::Size(200, 20);
             this->textBoxUsername->TabIndex = 0;
-            this->textBoxUsername->Text = L"Enter username";
             // 
             // textBoxPassword
             // 
@@ -72,7 +71,7 @@ namespace Project14 {
             this->buttonLogin->Name = L"buttonLogin";
             this->buttonLogin->Size = System::Drawing::Size(100, 23);
             this->buttonLogin->TabIndex = 2;
-            this->buttonLogin->Text = L"Login";
+            this->buttonLogin->Text = L"Вход";
             this->buttonLogin->UseVisualStyleBackColor = true;
             this->buttonLogin->Click += gcnew System::EventHandler(this, &LoginForm::buttonLogin_Click);
             // 
@@ -82,7 +81,7 @@ namespace Project14 {
             this->buttonRegister->Name = L"buttonRegister";
             this->buttonRegister->Size = System::Drawing::Size(100, 23);
             this->buttonRegister->TabIndex = 3;
-            this->buttonRegister->Text = L"Register";
+            this->buttonRegister->Text = L"Регистрация";
             this->buttonRegister->UseVisualStyleBackColor = true;
             this->buttonRegister->Click += gcnew System::EventHandler(this, &LoginForm::buttonRegister_Click);
             // 
@@ -91,18 +90,18 @@ namespace Project14 {
             this->label1->AutoSize = true;
             this->label1->Location = System::Drawing::Point(96, 59);
             this->label1->Name = L"label1";
-            this->label1->Size = System::Drawing::Size(80, 13);
+            this->label1->Size = System::Drawing::Size(108, 13);
             this->label1->TabIndex = 4;
-            this->label1->Text = L"enter username";
+            this->label1->Text = L"Введите псевдоним";
             // 
             // label2
             // 
             this->label2->AutoSize = true;
             this->label2->Location = System::Drawing::Point(96, 112);
             this->label2->Name = L"label2";
-            this->label2->Size = System::Drawing::Size(79, 13);
+            this->label2->Size = System::Drawing::Size(90, 13);
             this->label2->TabIndex = 5;
-            this->label2->Text = L"enter password";
+            this->label2->Text = L"Введите Пароль";
             // 
             // labelResultLogin
             // 
@@ -123,7 +122,7 @@ namespace Project14 {
             this->Controls->Add(this->buttonLogin);
             this->Controls->Add(this->buttonRegister);
             this->Name = L"LoginForm";
-            this->Text = L"Login / Register";
+            this->Text = L"Вход\\Регистрация";
             this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &LoginForm::LoginForm_FormClosed);
             this->Load += gcnew System::EventHandler(this, &LoginForm::LoginForm_Load);
             this->ResumeLayout(false);
