@@ -38,6 +38,7 @@ namespace Project14 {
            System::Windows::Forms::Button^ buttonRegister;
            bool sendCompleted;
            bool receiveCompleted;
+
            String^ serverResponse;
 
         void InitializeComponent()
@@ -219,6 +220,9 @@ private: System::Void LoginForm_FormClosed(System::Object^ sender, System::Windo
         
     }
 private: System::Void LoginForm_Load(System::Object^ sender, System::EventArgs^ e) {
+
+}
+private: System::Void openFileDialog1_FileOk(System::Object^ sender, System::ComponentModel::CancelEventArgs^ e) {
 
 }
 };
