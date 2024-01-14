@@ -46,14 +46,13 @@ namespace Project14 {
 
 
 
-           System::Windows::Forms::RichTextBox^ richTextBoxChat;
+
 
            void InitializeComponent()
            {
                System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(ClientForm::typeid));
                this->textBoxMessage = (gcnew System::Windows::Forms::TextBox());
                this->buttonSend = (gcnew System::Windows::Forms::Button());
-               this->richTextBoxChat = (gcnew System::Windows::Forms::RichTextBox());
                this->comboBoxChat = (gcnew System::Windows::Forms::ComboBox());
                this->label1 = (gcnew System::Windows::Forms::Label());
                this->createChatButton = (gcnew System::Windows::Forms::Button());
@@ -66,14 +65,14 @@ namespace Project14 {
                // 
                // textBoxMessage
                // 
-               this->textBoxMessage->Location = System::Drawing::Point(133, 236);
+               this->textBoxMessage->Location = System::Drawing::Point(135, 241);
                this->textBoxMessage->Name = L"textBoxMessage";
-               this->textBoxMessage->Size = System::Drawing::Size(200, 20);
+               this->textBoxMessage->Size = System::Drawing::Size(331, 20);
                this->textBoxMessage->TabIndex = 0;
                // 
                // buttonSend
                // 
-               this->buttonSend->Location = System::Drawing::Point(374, 236);
+               this->buttonSend->Location = System::Drawing::Point(507, 241);
                this->buttonSend->Name = L"buttonSend";
                this->buttonSend->Size = System::Drawing::Size(75, 20);
                this->buttonSend->TabIndex = 1;
@@ -81,21 +80,10 @@ namespace Project14 {
                this->buttonSend->UseVisualStyleBackColor = true;
                this->buttonSend->Click += gcnew System::EventHandler(this, &ClientForm::buttonSend_Click);
                // 
-               // richTextBoxChat
-               // 
-               this->richTextBoxChat->Font = (gcnew System::Drawing::Font(L"Arial", 8));
-               this->richTextBoxChat->Location = System::Drawing::Point(133, 24);
-               this->richTextBoxChat->Name = L"richTextBoxChat";
-               this->richTextBoxChat->ReadOnly = true;
-               this->richTextBoxChat->Size = System::Drawing::Size(316, 209);
-               this->richTextBoxChat->TabIndex = 2;
-               this->richTextBoxChat->Text = L"";
-               this->richTextBoxChat->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &ClientForm::richTextBoxChat_MouseClick);
-               // 
                // comboBoxChat
                // 
                this->comboBoxChat->FormattingEnabled = true;
-               this->comboBoxChat->Location = System::Drawing::Point(6, 49);
+               this->comboBoxChat->Location = System::Drawing::Point(5, 27);
                this->comboBoxChat->Name = L"comboBoxChat";
                this->comboBoxChat->Size = System::Drawing::Size(121, 21);
                this->comboBoxChat->TabIndex = 3;
@@ -106,7 +94,7 @@ namespace Project14 {
                // label1
                // 
                this->label1->AutoSize = true;
-               this->label1->Location = System::Drawing::Point(31, 24);
+               this->label1->Location = System::Drawing::Point(34, 11);
                this->label1->Name = L"label1";
                this->label1->Size = System::Drawing::Size(65, 13);
                this->label1->TabIndex = 4;
@@ -114,9 +102,9 @@ namespace Project14 {
                // 
                // createChatButton
                // 
-               this->createChatButton->Location = System::Drawing::Point(6, 236);
+               this->createChatButton->Location = System::Drawing::Point(5, 242);
                this->createChatButton->Name = L"createChatButton";
-               this->createChatButton->Size = System::Drawing::Size(117, 20);
+               this->createChatButton->Size = System::Drawing::Size(121, 20);
                this->createChatButton->TabIndex = 6;
                this->createChatButton->Text = L"создать чат";
                this->createChatButton->UseVisualStyleBackColor = true;
@@ -125,16 +113,16 @@ namespace Project14 {
                // CurrentChat
                // 
                this->CurrentChat->AutoSize = true;
-               this->CurrentChat->Location = System::Drawing::Point(133, 5);
+               this->CurrentChat->Location = System::Drawing::Point(132, 11);
                this->CurrentChat->Name = L"CurrentChat";
                this->CurrentChat->Size = System::Drawing::Size(0, 13);
                this->CurrentChat->TabIndex = 7;
                // 
                // updateChatButton
                // 
-               this->updateChatButton->Location = System::Drawing::Point(374, 0);
+               this->updateChatButton->Location = System::Drawing::Point(507, 2);
                this->updateChatButton->Name = L"updateChatButton";
-               this->updateChatButton->Size = System::Drawing::Size(75, 23);
+               this->updateChatButton->Size = System::Drawing::Size(75, 22);
                this->updateChatButton->TabIndex = 8;
                this->updateChatButton->Text = L"обновить";
                this->updateChatButton->UseVisualStyleBackColor = true;
@@ -143,7 +131,7 @@ namespace Project14 {
                // buttonSendFile
                // 
                this->buttonSendFile->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"buttonSendFile.Image")));
-               this->buttonSendFile->Location = System::Drawing::Point(339, 236);
+               this->buttonSendFile->Location = System::Drawing::Point(472, 242);
                this->buttonSendFile->Name = L"buttonSendFile";
                this->buttonSendFile->Size = System::Drawing::Size(29, 20);
                this->buttonSendFile->TabIndex = 9;
@@ -156,14 +144,15 @@ namespace Project14 {
                // 
                // flowLayoutPanelChat
                // 
-               this->flowLayoutPanelChat->Location = System::Drawing::Point(520, 24);
+               this->flowLayoutPanelChat->AutoScroll = true;
+               this->flowLayoutPanelChat->Location = System::Drawing::Point(135, 27);
                this->flowLayoutPanelChat->Name = L"flowLayoutPanelChat";
                this->flowLayoutPanelChat->Size = System::Drawing::Size(447, 209);
                this->flowLayoutPanelChat->TabIndex = 10;
                // 
                // ClientForm
                // 
-               this->ClientSize = System::Drawing::Size(979, 434);
+               this->ClientSize = System::Drawing::Size(622, 305);
                this->Controls->Add(this->flowLayoutPanelChat);
                this->Controls->Add(this->buttonSendFile);
                this->Controls->Add(this->updateChatButton);
@@ -173,7 +162,6 @@ namespace Project14 {
                this->Controls->Add(this->comboBoxChat);
                this->Controls->Add(this->textBoxMessage);
                this->Controls->Add(this->buttonSend);
-               this->Controls->Add(this->richTextBoxChat);
                this->Name = L"ClientForm";
                this->Text = L"Чат";
                this->ResumeLayout(false);
@@ -202,17 +190,17 @@ namespace Project14 {
                this->flowLayoutPanelChat->Controls->Add(fileButton);
            }
 
-private: System::Void OnFileButtonClick(System::Object^ sender, System::EventArgs^ e) {
-    Button^ fileButton = safe_cast<Button^>(sender);
-    String^ fileInfo = fileButton->Text;
-    // Извлекаем имя файла из текста кнопки
-    // Пример: "User отправил файл: filename.txt"
-    array<String^>^ parts = fileInfo->Split(':');
-    if (parts->Length >= 2) {
-        String^ fileName = parts[1]->Trim();
-        RequestFileDownload(fileName);
+    private: System::Void OnFileButtonClick(System::Object^ sender, System::EventArgs^ e) {
+        Button^ fileButton = safe_cast<Button^>(sender);
+        String^ fileInfo = fileButton->Text;
+        // Извлекаем имя файла из текста кнопки
+        // Пример: "User отправил файл: filename.txt"
+        array<String^>^ parts = fileInfo->Split(':');
+        if (parts->Length >= 2) {
+            String^ fileName = parts[3]->Trim();
+            RequestFileDownload(fileName, comboBoxChat->Text);
+        }
     }
-}
 
            //flow<-
 
@@ -283,84 +271,110 @@ private: System::Void OnFileButtonClick(System::Object^ sender, System::EventArg
                SendRequestAndGetResponse(message);
                textBoxMessage->Clear();
            }
-           private: array<Byte>^ ReceiveFileData(TcpClient^ client, int fileSize) {
-               NetworkStream^ stream = client->GetStream();
-               array<Byte>^ fileData = gcnew array<Byte>(fileSize);
+    private: array<Byte>^ ReceiveFileData(TcpClient^ client, int fileSize) {
+        NetworkStream^ stream = client->GetStream();
+        array<Byte>^ fileData = gcnew array<Byte>(fileSize);
+        int totalBytesRead = 0;
 
-               int totalBytesRead = 0;
-               int bytesRead;
+        while (totalBytesRead < fileSize) {
+            int bufferLength = Math::Min(1024, fileSize - totalBytesRead);
+            array<Byte>^ buffer = gcnew array<Byte>(bufferLength);
+            int bytesRead = stream->Read(buffer, 0, bufferLength);
+            if (bytesRead == 0) {
+                throw gcnew ApplicationException("The file stream was closed unexpectedly.");
+            }
+            Array::Copy(buffer, 0, fileData, totalBytesRead, bytesRead);
+            totalBytesRead += bytesRead;
+        }
 
-               while (totalBytesRead < fileSize) {
-                   int bufferLength = Math::Min(1024, fileSize - totalBytesRead);
-                   array<Byte>^ buffer = gcnew array<Byte>(bufferLength);
-                   bytesRead = stream->Read(buffer, 0, bufferLength);
-                   Array::Copy(buffer, 0, fileData, totalBytesRead, bytesRead);
-                   totalBytesRead += bytesRead;
-
-                   if (bytesRead == 0) {
-                       // Выходим из цикла, если нет данных для чтения
-                       break;
-                   }
-               }
-
-               return fileData;
-           }
-
-           private: System::Void RequestFileDownload(String^ fileName) {
-               // Формируем запрос на получение файла
-               String^ request = "get_file_request:" + fileName;
-
-               // Создаем TCP-клиент для подключения к серверу
-               TcpClient^ client = CreateClient();
-               NetworkStream^ stream = client->GetStream();
-
-               // Отправляем запрос на сервер
-               array<Byte>^ requestBytes = Encoding::UTF8->GetBytes(request);
-               stream->Write(requestBytes, 0, requestBytes->Length);
-               stream->Flush();
-
-               // Ожидаем ответа от сервера: сначала размер файла
-               array<Byte>^ sizeBuffer = gcnew array<Byte>(sizeof(int));
-               stream->Read(sizeBuffer, 0, sizeBuffer->Length);
-               int fileSize = BitConverter::ToInt32(sizeBuffer, 0);
-
-               // Получаем данные файла
-               array<Byte>^ fileData = ReceiveFileData(client, fileSize);
-
-               // Сохраняем файл локально
-               SaveFileLocally(fileName, fileData);
-               Console::WriteLine("File size: " + fileSize);
-
-               // Закрываем соединение
-               client->Close();
-           }
-private: System::Void SaveFileLocally(String^ fileName, array<Byte>^ fileData) {
-    String^ correctExtension;
-    if (fileName->EndsWith(".txt")) {
-        correctExtension = ".txt";
-    }
-    else if (fileName->EndsWith(".png")) {
-        correctExtension = ".png";
-    }
-    else {
-        // Если расширение неизвестно, можно выбрать расширение по умолчанию
-        correctExtension = ".bin"; // Бинарный файл без указания типа
+        return fileData;
     }
 
-    // Убедитесь, что имя файла заканчивается нужным расширением
-    if (!fileName->EndsWith(correctExtension)) {
-        fileName = System::IO::Path::ChangeExtension(fileName, correctExtension);
+
+    private: System::Void RequestFileDownload(String^ fileName, String^ chatname) {
+        TcpClient^ client = CreateClient();
+        try {
+            String^ request = String::Format("get_file_request:{0}:{1}", fileName, chatname);
+
+            NetworkStream^ stream = client->GetStream();
+
+            // Отправка запроса на сервер
+            array<Byte>^ requestBytes = Encoding::UTF8->GetBytes(request);
+            stream->Write(requestBytes, 0, requestBytes->Length);
+            stream->Flush();
+
+            // Ожидание информации о файле от сервера
+            array<Byte>^ fileInfoBytes = gcnew array<Byte>(1024); // Здесь предполагается максимальная длина информации о файле
+            int bytesRead = stream->Read(fileInfoBytes, 0, fileInfoBytes->Length);
+            String^ fileInfo = Encoding::UTF8->GetString(fileInfoBytes, 0, bytesRead);
+
+            // Разбор информации о файле
+            array<String^>^ fileInfoParts = fileInfo->Split(':');
+            if (fileInfoParts->Length == 2) {
+                String^ receivedFileName = fileInfoParts[0];
+                int fileSize = Int32::Parse(fileInfoParts[1]);
+
+                // Проверка размера файла перед загрузкой (не более 20 МБ)
+                if (fileSize <= 20 * 1024 * 1024) { // 20 МБ в байтах
+                    // Создание буфера для данных файла
+                    array<Byte>^ fileData = gcnew array<Byte>(fileSize);
+
+                    // Чтение данных файла в буфер
+                    int totalBytesReceived = 0;
+                    while (totalBytesReceived < fileSize) {
+                        int bytesReceived = stream->Read(fileData, totalBytesReceived, fileSize - totalBytesReceived);
+                        if (bytesReceived <= 0) {
+                            Console::WriteLine("Error: No data received from the server.");
+                            break;
+                        }
+                        totalBytesReceived += bytesReceived;
+                        Console::WriteLine("Received {0} bytes out of {1} bytes.", totalBytesReceived, fileSize);
+                    }
+
+                    // Сохранение файла локально
+                    SaveFileLocally(receivedFileName, fileData, fileSize);
+                    Console::WriteLine("File downloaded successfully. Size: {0} bytes.", fileSize);
+                }
+                else {
+                    Console::WriteLine("File size exceeds the limit (20 MB).");
+                }
+            }
+            else {
+                Console::WriteLine("Invalid file information format received from the server.");
+            }
+        }
+        catch (Exception^ ex) {
+            Console::WriteLine("Error during file download: " + ex->Message);
+        }
+        finally {
+            client->Close();
+        }
     }
 
-    SaveFileDialog^ saveFileDialog = gcnew SaveFileDialog();
-    saveFileDialog->FileName = fileName;
-    if (saveFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
-        String^ filePath = saveFileDialog->FileName;
-        System::IO::File::WriteAllBytes(filePath, fileData);
-        Console::WriteLine("Файл сохранен: " + filePath);
 
+
+
+
+
+
+    private: System::Void SaveFileLocally(String^ fileName, array<Byte>^ fileData, int fileSize) {
+        SaveFileDialog^ saveFileDialog = gcnew SaveFileDialog();
+        saveFileDialog->FileName = fileName;
+        if (saveFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+            String^ filePath = saveFileDialog->FileName;
+            // Сохраняем только первые fileSize байтов из массива fileData
+            array<Byte>^ trimmedFileData = gcnew array<Byte>(fileSize);
+            Array::Copy(fileData, trimmedFileData, fileSize);
+            System::IO::File::WriteAllBytes(filePath, trimmedFileData);
+            Console::WriteLine("File '{0}' saved locally at '{1}'.", fileName, filePath);
+        }
+        else {
+            Console::WriteLine("File save operation cancelled by user.");
+        }
     }
-}
+
+
+
 
 
 
@@ -452,15 +466,7 @@ private: System::Void buttonSendFile_Click(System::Object^ sender, System::Event
 }
        
        
-private: System::Void richTextBoxChat_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-    if (e->Button == System::Windows::Forms::MouseButtons::Left) {
-        String^ selectedText = richTextBoxChat->SelectedText;
-        if (!String::IsNullOrEmpty(selectedText) && selectedText->StartsWith("file ")) {
-            String^ fileName = selectedText->Substring(14);
-            RequestFileDownload(fileName);
-        }
-    }
-}
+
 private: System::Void saveFileDialog1_FileOk(System::Object^ sender, System::ComponentModel::CancelEventArgs^ e) {
 }
 
