@@ -106,7 +106,6 @@ namespace Project14 {
                this->toolTip1->SetToolTip(this->comboBoxChat, L"Выбрать чат \r\n Поиск происходит по введенному тексту \r\n Если текст пустой, то буд"
                    L"ет выполняться поиск всех чатов");
                this->comboBoxChat->DropDown += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_DropDown);
-               this->comboBoxChat->SelectedIndexChanged += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_SelectedIndexChanged);
                this->comboBoxChat->DropDownClosed += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_DropDownClosed);
                // 
                // label1
@@ -196,7 +195,6 @@ namespace Project14 {
                // 
                // toolTip1
                // 
-               this->toolTip1->Popup += gcnew System::Windows::Forms::PopupEventHandler(this, &ClientForm::toolTip1_Popup);
                // 
                // toolStripMenuItemHelp
                // 
@@ -248,276 +246,274 @@ namespace Project14 {
 
            //flow
 
+           // Функция для добавления текстового сообщения в чат
            void AddMessageToChat(String^ message) {
                Label^ messageLabel = gcnew Label();
                messageLabel->Text = message;
                messageLabel->AutoSize = true;
-               messageLabel->Height = 30; // Установите желаемую высоту для Label
-               messageLabel->Margin = System::Windows::Forms::Padding(0, 5, 0, 5); // Установите желаемые отступы (верхний и нижний)
+               messageLabel->Height = 30;
+               messageLabel->Margin = System::Windows::Forms::Padding(0, 5, 0, 5);
                this->flowLayoutPanelChat->Controls->Add(messageLabel);
            }
 
+           // Функция для добавления кнопки с файлом в чат
            void AddFileToChat(String^ fileName) {
                Button^ fileButton = gcnew Button();
                fileButton->Text = fileName;
                fileButton->AutoSize = true;
-               fileButton->Height = 30; // Установите желаемую высоту для Button
-               fileButton->Margin = System::Windows::Forms::Padding(0, 5, 0, 5); // Установите желаемые отступы (верхний и нижний)
+               fileButton->Height = 30;
+               fileButton->Margin = System::Windows::Forms::Padding(0, 5, 0, 5);
                fileButton->Click += gcnew System::EventHandler(this, &ClientForm::OnFileButtonClick);
                this->flowLayoutPanelChat->Controls->Add(fileButton);
            }
 
-    private: System::Void OnFileButtonClick(System::Object^ sender, System::EventArgs^ e) {
-        Button^ fileButton = safe_cast<Button^>(sender);
-        String^ fileInfo = fileButton->Text;
-        // Извлекаем имя файла из текста кнопки
-        // Пример: "User отправил файл: filename.txt"
-        array<String^>^ parts = fileInfo->Split(':');
-        if (parts->Length >= 2) {
-            String^ fileName = parts[3]->Trim();
-            RequestFileDownload(fileName, comboBoxChat->Text);
-        }
+           // Обработчик события нажатия на кнопку с файлом в чате
+private: System::Void OnFileButtonClick(System::Object^ sender, System::EventArgs^ e) {
+    // Извлекаем информацию о файле из текста кнопки
+    Button^ fileButton = safe_cast<Button^>(sender);
+    String^ fileInfo = fileButton->Text;
+    array<String^>^ parts = fileInfo->Split(':');
+    if (parts->Length >= 2) {
+        String^ fileName = parts[3]->Trim();
+        RequestFileDownload(fileName, comboBoxChat->Text);
     }
+}
 
            //flow<-
 
-           String^ SendRequestAndGetResponse(String^ request) {
-               // Отправка запроса серверу и получение ответа
-               try {
-                   TcpClient^ client = CreateClient();
-                   NetworkStream^ stream = client->GetStream();
+           // Функция для отправки запроса на сервер и получения ответа
+       String^ SendRequestAndGetResponse(String^ request) {
+           try {
+               TcpClient^ client = CreateClient();
+               NetworkStream^ stream = client->GetStream();
 
-                   array<Byte>^ data = Encoding::UTF8->GetBytes(request);
-                   stream->Write(data, 0, data->Length);
+               // Отправляем запрос на сервер
+               array<Byte>^ data = Encoding::UTF8->GetBytes(request);
+               stream->Write(data, 0, data->Length);
 
-                   array<Byte>^ responseData = gcnew array<Byte>(1024);
-                   int bytesRead = stream->Read(responseData, 0, responseData->Length);
-                   String^ response = Encoding::UTF8->GetString(responseData, 0, bytesRead);
+               // Получаем ответ от сервера
+               array<Byte>^ responseData = gcnew array<Byte>(1024);
+               int bytesRead = stream->Read(responseData, 0, responseData->Length);
+               String^ response = Encoding::UTF8->GetString(responseData, 0, bytesRead);
 
-                   client->Close();
-                   return response;
-               }
-               catch (Exception^ ex) {
-                   Console::WriteLine("Error: " + ex->Message);
-                   return "";
+               client->Close();
+               return response;
+           }
+           catch (Exception^ ex) {
+               Console::WriteLine("Error: " + ex->Message);
+               return "";
+           }
+       }
+
+       // Функция для обновления списка чатов из ответа сервера
+       void FillChatList() {
+           String^ getChatListRequest = "get_chat_list_request:" + comboBoxChat->Text;
+           String^ chatList = SendRequestAndGetResponse(getChatListRequest);
+
+           if (!String::IsNullOrEmpty(chatList)) {
+               array<String^>^ chatNames = chatList->Split(',');
+
+               comboBoxChat->Items->Clear();
+
+               for each (String ^ chatName in chatNames) {
+                   comboBoxChat->Items->Add(chatName->Trim());
                }
            }
-
-           void FillChatList() {
-               // Заполнение списка чатов из ответа сервера
-               String^ getChatListRequest = "get_chat_list_request:" + comboBoxChat->Text;
-               String^ chatList = SendRequestAndGetResponse(getChatListRequest);
-
-               if (!String::IsNullOrEmpty(chatList)) {
-                   array<String^>^ chatNames = chatList->Split(',');
-
-                   comboBoxChat->Items->Clear();
-
-                   for each (String ^ chatName in chatNames) {
-                       comboBoxChat->Items->Add(chatName->Trim());
-                   }
-               }
-           }
+       }
            //sendfile
-           void SendFile(array<Byte>^ requestBytes) {
-               try {
-                   TcpClient^ client = CreateClient();
-                   NetworkStream^ stream = client->GetStream();
+           // Функция для отправки файла на сервер
+       void SendFile(array<Byte>^ requestBytes) {
+           try {
+               TcpClient^ client = CreateClient();
+               NetworkStream^ stream = client->GetStream();
 
-                   // Отправка массива байтов запроса
-                   stream->Write(requestBytes, 0, requestBytes->Length);
-                   stream->Flush();
+               // Отправляем массив байтов запроса
+               stream->Write(requestBytes, 0, requestBytes->Length);
+               stream->Flush();
 
-                   // Получение ответа от сервера
-                   array<Byte>^ responseBytes = gcnew array<Byte>(1024);
-                   int bytesRead = stream->Read(responseBytes, 0, responseBytes->Length);
-                   String^ response = Encoding::UTF8->GetString(responseBytes, 0, bytesRead);
-                   Console::WriteLine("Server response: " + response);
+               // Получаем ответ от сервера
+               array<Byte>^ responseBytes = gcnew array<Byte>(1024);
+               int bytesRead = stream->Read(responseBytes, 0, responseBytes->Length);
+               String^ response = Encoding::UTF8->GetString(responseBytes, 0, bytesRead);
+               Console::WriteLine("Server response: " + response);
 
-                   // Закрытие соединения
-                   client->Close();
-               }
-               catch (Exception^ ex) {
-                   Console::WriteLine("Error: " + ex->Message);
-               }
+               // Закрываем соединение
+               client->Close();
            }
-           System::Void buttonSend_Click(System::Object^ sender, System::EventArgs^ e)
-           {
-               // Обработка нажатия на кнопку "Отправить"
-               String^ message = "send_message_request:" + comboBoxChat->Text + ":" + Global::GlobalData::CurrentUser + ":" + textBoxMessage->Text;
-               SendRequestAndGetResponse(message);
-               textBoxMessage->Clear();
+           catch (Exception^ ex) {
+               Console::WriteLine("Error: " + ex->Message);
            }
-    private: array<Byte>^ ReceiveFileData(TcpClient^ client, int fileSize) {
-        NetworkStream^ stream = client->GetStream();
-        array<Byte>^ fileData = gcnew array<Byte>(fileSize);
-        int totalBytesRead = 0;
+       }
+       // Обработчик события нажатия на кнопку "Отправить сообщение"
+       System::Void buttonSend_Click(System::Object^ sender, System::EventArgs^ e)
+       {
+           // Формируем и отправляем запрос на отправку сообщения
+           String^ message = "send_message_request:" + comboBoxChat->Text + ":" + Global::GlobalData::CurrentUser + ":" + textBoxMessage->Text;
+           SendRequestAndGetResponse(message);
+           textBoxMessage->Clear();
+       }
+       // Функция для приема данных файла с сервера
+private: array<Byte>^ ReceiveFileData(TcpClient^ client, int fileSize) {
+    NetworkStream^ stream = client->GetStream();
+    array<Byte>^ fileData = gcnew array<Byte>(fileSize);
+    int totalBytesRead = 0;
 
-        while (totalBytesRead < fileSize) {
-            int bufferLength = Math::Min(1024, fileSize - totalBytesRead);
-            array<Byte>^ buffer = gcnew array<Byte>(bufferLength);
-            int bytesRead = stream->Read(buffer, 0, bufferLength);
-            if (bytesRead == 0) {
-                throw gcnew ApplicationException("The file stream was closed unexpectedly.");
-            }
-            Array::Copy(buffer, 0, fileData, totalBytesRead, bytesRead);
-            totalBytesRead += bytesRead;
+    while (totalBytesRead < fileSize) {
+        int bufferLength = Math::Min(1024, fileSize - totalBytesRead);
+        array<Byte>^ buffer = gcnew array<Byte>(bufferLength);
+        int bytesRead = stream->Read(buffer, 0, bufferLength);
+        if (bytesRead == 0) {
+            throw gcnew ApplicationException("The file stream was closed unexpectedly.");
         }
-
-        return fileData;
+        Array::Copy(buffer, 0, fileData, totalBytesRead, bytesRead);
+        totalBytesRead += bytesRead;
     }
 
+    return fileData;
+}
 
-    private: System::Void RequestFileDownload(String^ fileName, String^ chatname) {
-        TcpClient^ client = CreateClient();
-        try {
-            String^ request = String::Format("get_file_request:{0}:{1}", fileName, chatname);
 
-            NetworkStream^ stream = client->GetStream();
+       // Функция для запроса скачивания файла с сервера
+private: System::Void RequestFileDownload(String^ fileName, String^ chatname) {
+    TcpClient^ client = CreateClient();
+    try {
+        String^ request = String::Format("get_file_request:{0}:{1}", fileName, chatname);
 
-            // Отправка запроса на сервер
-            array<Byte>^ requestBytes = Encoding::UTF8->GetBytes(request);
-            stream->Write(requestBytes, 0, requestBytes->Length);
-            stream->Flush();
+        NetworkStream^ stream = client->GetStream();
 
-            // Ожидание информации о файле от сервера
-            array<Byte>^ fileInfoBytes = gcnew array<Byte>(1024); // Здесь предполагается максимальная длина информации о файле
-            int bytesRead = stream->Read(fileInfoBytes, 0, fileInfoBytes->Length);
-            String^ fileInfo = Encoding::UTF8->GetString(fileInfoBytes, 0, bytesRead);
+        // Отправка запроса на сервер
+        array<Byte>^ requestBytes = Encoding::UTF8->GetBytes(request);
+        stream->Write(requestBytes, 0, requestBytes->Length);
+        stream->Flush();
 
-            // Разбор информации о файле
-            array<String^>^ fileInfoParts = fileInfo->Split(':');
-            if (fileInfoParts->Length == 2) {
-                String^ receivedFileName = fileInfoParts[0];
-                int fileSize = Int32::Parse(fileInfoParts[1]);
+        // Ожидание информации о файле от сервера
+        array<Byte>^ fileInfoBytes = gcnew array<Byte>(1024); // Максимальная длина информации о файле
+        int bytesRead = stream->Read(fileInfoBytes, 0, fileInfoBytes->Length);
+        String^ fileInfo = Encoding::UTF8->GetString(fileInfoBytes, 0, bytesRead);
 
-                // Проверка размера файла перед загрузкой (не более 20 МБ)
-                if (fileSize <= 20 * 1024 * 1024) { // 20 МБ в байтах
-                    // Создание буфера для данных файла
-                    array<Byte>^ fileData = gcnew array<Byte>(fileSize);
+        // Разбор информации о файле
+        array<String^>^ fileInfoParts = fileInfo->Split(':');
+        if (fileInfoParts->Length == 2) {
+            String^ receivedFileName = fileInfoParts[0];
+            int fileSize = Int32::Parse(fileInfoParts[1]);
 
-                    // Чтение данных файла в буфер
-                    int totalBytesReceived = 0;
-                    while (totalBytesReceived < fileSize) {
-                        int bytesReceived = stream->Read(fileData, totalBytesReceived, fileSize - totalBytesReceived);
-                        if (bytesReceived <= 0) {
-                            Console::WriteLine("Error: No data received from the server.");
-                            break;
-                        }
-                        totalBytesReceived += bytesReceived;
-                        Console::WriteLine("Received {0} bytes out of {1} bytes.", totalBytesReceived, fileSize);
+            // Проверка размера файла перед загрузкой (не более 20 МБ)
+            if (fileSize <= 20 * 1024 * 1024) { // 20 МБ в байтах
+                // Создание буфера для данных файла
+                array<Byte>^ fileData = gcnew array<Byte>(fileSize);
+
+                // Чтение данных файла в буфер
+                int totalBytesReceived = 0;
+                while (totalBytesReceived < fileSize) {
+                    int bytesReceived = stream->Read(fileData, totalBytesReceived, fileSize - totalBytesReceived);
+                    if (bytesReceived <= 0) {
+                        Console::WriteLine("Error: No data received from the server.");
+                        break;
                     }
+                    totalBytesReceived += bytesReceived;
+                    Console::WriteLine("Received {0} bytes out of {1} bytes.", totalBytesReceived, fileSize);
+                }
 
-                    // Сохранение файла локально
-                    SaveFileLocally(receivedFileName, fileData, fileSize);
-                    Console::WriteLine("File downloaded successfully. Size: {0} bytes.", fileSize);
-                }
-                else {
-                    Console::WriteLine("File size exceeds the limit (20 MB).");
-                }
+                // Сохранение файла локально
+                SaveFileLocally(receivedFileName, fileData, fileSize);
+                Console::WriteLine("File downloaded successfully. Size: {0} bytes.", fileSize);
             }
             else {
-                Console::WriteLine("Invalid file information format received from the server.");
+                Console::WriteLine("File size exceeds the limit (20 MB).");
             }
         }
-        catch (Exception^ ex) {
-            Console::WriteLine("Error during file download: " + ex->Message);
-        }
-        finally {
-            client->Close();
-        }
-    }
-
-
-
-
-
-
-
-    private: System::Void SaveFileLocally(String^ fileName, array<Byte>^ fileData, int fileSize) {
-        SaveFileDialog^ saveFileDialog = gcnew SaveFileDialog();
-        saveFileDialog->FileName = fileName;
-        if (saveFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
-            String^ filePath = saveFileDialog->FileName;
-            // Сохраняем только первые fileSize байтов из массива fileData
-            array<Byte>^ trimmedFileData = gcnew array<Byte>(fileSize);
-            Array::Copy(fileData, trimmedFileData, fileSize);
-            System::IO::File::WriteAllBytes(filePath, trimmedFileData);
-            Console::WriteLine("File '{0}' saved locally at '{1}'.", fileName, filePath);
-        }
         else {
-            Console::WriteLine("File save operation cancelled by user.");
+            Console::WriteLine("Invalid file information format received from the server.");
         }
     }
+    catch (Exception^ ex) {
+        Console::WriteLine("Error during file download: " + ex->Message);
+    }
+    finally {
+        client->Close();
+    }
+}
 
 
-
-
-
-
+       // Функция для сохранения файла локально
+private: System::Void SaveFileLocally(String^ fileName, array<Byte>^ fileData, int fileSize) {
+    SaveFileDialog^ saveFileDialog = gcnew SaveFileDialog();
+    saveFileDialog->FileName = fileName;
+    if (saveFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+        String^ filePath = saveFileDialog->FileName;
+        // Сохраняем только первые fileSize байтов из массива fileData
+        array<Byte>^ trimmedFileData = gcnew array<Byte>(fileSize);
+        Array::Copy(fileData, trimmedFileData, fileSize);
+        System::IO::File::WriteAllBytes(filePath, trimmedFileData);
+        Console::WriteLine("File '{0}' saved locally at '{1}'.", fileName, filePath);
+    }
+    else {
+        Console::WriteLine("File save operation cancelled by user.");
+    }
+}
     private:
         System::ComponentModel::IContainer^ components;
-    private: System::Void comboBoxChat_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
-
+        // Обработчик события раскрытия выпадающего списка чатов
+private: System::Void comboBoxChat_DropDown(System::Object^ sender, System::EventArgs^ e) {
+    // Обновление списка чатов при раскрытии выпадающего списка
+    comboBoxChat->Items->Clear();
+    FillChatList();
+}
+       // Обработчик события нажатия на кнопку создания нового чата
+private: System::Void createChatButton_Click(System::Object^ sender, System::EventArgs^ e) {
+    // Создание нового чата
+    String^ newChatName = Interaction::InputBox("Enter chat name:", "Create Chat", "", -1, -1);
+    if (newChatName != "") {
+        String^ createChatRequest = "create_chat_request:" + newChatName;
+        String^ response = SendRequestAndGetResponse(createChatRequest);
+        Console::WriteLine("Server response: {0}", response);
     }
-           System::Void comboBoxChat_DropDown(System::Object^ sender, System::EventArgs^ e) {
-               // Обновление списка чатов при раскрытии выпадающего списка
-               comboBoxChat->Items->Clear();
-               FillChatList();
-           }
-           System::Void createChatButton_Click(System::Object^ sender, System::EventArgs^ e) {
-               // Создание нового чата
-               String^ newChatName = Interaction::InputBox("Enter chat name:", "Create Chat", "", -1, -1);
-               if (newChatName != "") {
-                   String^ createChatRequest = "create_chat_request:" + newChatName;
-                   String^ response = SendRequestAndGetResponse(createChatRequest);
-                   Console::WriteLine("Server response: {0}", response);
-               }
-           }
-           System::Void comboBoxChat_DropDownClosed(System::Object^ sender, System::EventArgs^ e) {
-               // Обновление текста текущего чата после закрытия выпадающего списка
-               groupBoxChat->Text = "Чат " + comboBoxChat->SelectedText;
-           }
-           System::Void updateChatButton_Click(System::Object^ sender, System::EventArgs^ e) {
-               // Обновление истории чата
-               flowLayoutPanelChat->Controls->Clear();
+}
+       // Обработчик события закрытия выпадающего списка чатов
+private: System::Void comboBoxChat_DropDownClosed(System::Object^ sender, System::EventArgs^ e) {
+    // Обновление текста текущего чата после закрытия выпадающего списка
+    groupBoxChat->Text = "Чат " + comboBoxChat->SelectedText;
+}
 
-               String^ getMessageListRequest = "get_chat_history_request:" + comboBoxChat->Text + ":" + Global::GlobalData::CurrentUser;
-               String^ response = SendRequestAndGetResponse(getMessageListRequest);
+       // Обработчик события нажатия на кнопку обновления чата
+private: System::Void updateChatButton_Click(System::Object^ sender, System::EventArgs^ e) {
+    // Обновление истории чата
+    flowLayoutPanelChat->Controls->Clear();
 
-               if (!String::IsNullOrEmpty(response)) {
-                   array<String^>^ messages = response->Split('\n');
-                   for each (String ^ message in messages) {
-                       if (String::IsNullOrEmpty(message)) continue;
+    String^ getMessageListRequest = "get_chat_history_request:" + comboBoxChat->Text + ":" + Global::GlobalData::CurrentUser;
+    String^ response = SendRequestAndGetResponse(getMessageListRequest);
 
-                       array<String^>^ parts = message->Split(':');
-                       if (parts->Length < 3) continue;
+    if (!String::IsNullOrEmpty(response)) {
+        array<String^>^ messages = response->Split('\n');
+        for each (String ^ message in messages) {
+            if (String::IsNullOrEmpty(message)) continue;
 
-                       String^ messageType = parts[0];
-                       String^ senderName = parts[1];
-                       String^ content = String::Join(":", parts, 2, parts->Length - 2);
+            array<String^>^ parts = message->Split(':');
+            if (parts->Length < 3) continue;
 
-                       if (messageType == "message") {
-                           // Создаем Label для текстового сообщения
-                           Label^ messageLabel = gcnew Label();
-                           messageLabel->Text = String::Format("{0}: {1}", senderName, content);
-                           messageLabel->AutoSize = true;
-                           flowLayoutPanelChat->Controls->Add(messageLabel);
-                       }
-                       else if (messageType == "file") {
-                           // Создаем Button для файла
-                           Button^ fileButton = gcnew Button();
-                           fileButton->Text = String::Format("{0} отправил файл: {1}", senderName, content);
-                           fileButton->AutoSize = true;
-                           fileButton->Click += gcnew System::EventHandler(this, &ClientForm::OnFileButtonClick);
-                           flowLayoutPanelChat->Controls->Add(fileButton);
-                       }
-                   }
-               }
-    };
-    private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
+            String^ messageType = parts[0];
+            String^ senderName = parts[1];
+            String^ content = String::Join(":", parts, 2, parts->Length - 2);
 
+            if (messageType == "message") {
+                // Создаем Label для текстового сообщения
+                Label^ messageLabel = gcnew Label();
+                messageLabel->Text = String::Format("{0}: {1}", senderName, content);
+                messageLabel->AutoSize = true;
+                flowLayoutPanelChat->Controls->Add(messageLabel);
+            }
+            else if (messageType == "file") {
+                // Создаем Button для файла
+                Button^ fileButton = gcnew Button();
+                fileButton->Text = String::Format("{0} отправил файл: {1}", senderName, content);
+                fileButton->AutoSize = true;
+                fileButton->Click += gcnew System::EventHandler(this, &ClientForm::OnFileButtonClick);
+                flowLayoutPanelChat->Controls->Add(fileButton);
+            }
+        }
     }
+}
+       // Обработчик события нажатия на кнопку отправки файла
 private: System::Void buttonSendFile_Click(System::Object^ sender, System::EventArgs^ e) {
     if (this->openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
         String^ filePath = this->openFileDialog1->FileName;
@@ -541,21 +537,14 @@ private: System::Void buttonSendFile_Click(System::Object^ sender, System::Event
         SendFile(requestBytes);
     }
 }
-       
-       
-
-private: System::Void saveFileDialog1_FileOk(System::Object^ sender, System::ComponentModel::CancelEventArgs^ e) {
-}
-
-
+       // Обработчик события нажатия на кнопку выхода из приложения
 private: System::Void exitToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e) {
     this->Hide();
     Application::Exit();
 }
-private: System::Void toolTip1_Popup(System::Object^ sender, System::Windows::Forms::PopupEventArgs^ e) {
-}
+       // Обработчик события нажатия на пункт меню "Справка"
 private: System::Void toolStripMenuItemHelp_Click(System::Object^ sender, System::EventArgs^ e) {
-    
+    // Отображение справки или помощи
     System::Windows::Forms::Help::ShowHelp(this, helpProvider1->HelpNamespace, System::Windows::Forms::HelpNavigator::Topic, "ClientForm");
 }
 };

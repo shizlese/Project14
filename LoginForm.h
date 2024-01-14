@@ -165,8 +165,6 @@ namespace Project14 {
             this->MainMenuStrip = this->menuStrip1;
             this->Name = L"LoginForm";
             this->Text = L"Вход\\Регистрация";
-            this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &LoginForm::LoginForm_FormClosed);
-            this->Load += gcnew System::EventHandler(this, &LoginForm::LoginForm_Load);
             this->menuStrip1->ResumeLayout(false);
             this->menuStrip1->PerformLayout();
             this->ResumeLayout(false);
@@ -191,15 +189,16 @@ namespace Project14 {
             this->helpProvider1->SetShowHelp(this, true);
             this->helpProvider1->HelpNamespace = helpFilePath;
         }
-        void buttonLogin_Click(System::Object^ sender, System::EventArgs^ e)
+        // Метод для попытки входа
+        void AttemptLogin(String^ username, String^ password)
         {
-            String^ username = textBoxUsername->Text;
-            String^ password = textBoxPassword->Text;
             try
             {
-                TcpClient ^ client = gcnew TcpClient("127.0.0.1", 1234);
+                // Создание клиента TCP и получение сетевого потока
+                TcpClient^ client = gcnew TcpClient("127.0.0.1", 1234);
                 NetworkStream^ stream = client->GetStream();
 
+                // Формирование данных для входа
                 String^ loginData = "login_request:" + username + ":" + password;
                 array<Byte>^ sendData = Encoding::UTF8->GetBytes(loginData);
 
@@ -228,22 +227,23 @@ namespace Project14 {
 
                 client->Close();
             }
-                catch (Exception^ ex)
+            catch (Exception^ ex)
             {
                 // Обработка ошибок соединения с сервером
-                    labelResultLogin->Text=("Error connecting to the server: " + ex->Message);
+                labelResultLogin->Text = ("Error connecting to the server: " + ex->Message);
             }
         }
 
-        void buttonRegister_Click(System::Object^ sender, System::EventArgs^ e)
+        // Метод для попытки регистрации
+        void AttemptRegistration(String^ username, String^ password)
         {
-            String^ username = textBoxUsername->Text;
-            String^ password = textBoxPassword->Text;
             try
             {
+                // Создание клиента TCP и получение сетевого потока
                 TcpClient^ client = gcnew TcpClient("127.0.0.1", 1234);
                 NetworkStream^ stream = client->GetStream();
 
+                // Формирование данных для регистрации
                 String^ loginData = "register_request:" + username + ":" + password;
                 array<Byte>^ sendData = Encoding::UTF8->GetBytes(loginData);
 
@@ -258,12 +258,12 @@ namespace Project14 {
                 // Обработка полученного ответа
                 if (response == "Registration successful")
                 {
-                    // Вход успешен, открываем форму чата (ClientForm)
+                    // Регистрация успешна
                     labelResultLogin->Text = "новый пользователь успешно создан";
                 }
                 else if (response == "Username already exists")
                 {
-                    // Неверные учетные данные, обработайте соответственно
+                    // Пользователь с таким именем уже существует
                     labelResultLogin->Text = "пользователь с таким именем уже существует";
                 }
 
@@ -272,20 +272,25 @@ namespace Project14 {
             catch (Exception^ ex)
             {
                 // Обработка ошибок соединения с сервером
-                labelResultLogin->Text=("Error connecting to the server: " + ex->Message);
+                labelResultLogin->Text = ("Error connecting to the server: " + ex->Message);
             }
         }
 
-        
-private: System::Void LoginForm_FormClosed(System::Object^ sender, System::Windows::Forms::FormClosedEventArgs^ e) {
-        
-    }
-private: System::Void LoginForm_Load(System::Object^ sender, System::EventArgs^ e) {
+        // Обработчик события нажатия на кнопку входа
+        void buttonLogin_Click(System::Object^ sender, System::EventArgs^ e)
+        {
+            String^ username = textBoxUsername->Text;
+            String^ password = textBoxPassword->Text;
+            AttemptLogin(username, password);
+        }
 
-}
-private: System::Void openFileDialog1_FileOk(System::Object^ sender, System::ComponentModel::CancelEventArgs^ e) {
-
-}
+        // Обработчик события нажатия на кнопку регистрации
+        void buttonRegister_Click(System::Object^ sender, System::EventArgs^ e)
+        {
+            String^ username = textBoxUsername->Text;
+            String^ password = textBoxPassword->Text;
+            AttemptRegistration(username, password);
+        }
 private: System::Void toolStripMenuItemExit_Click(System::Object^ sender, System::EventArgs^ e) {
     this->Hide();
     Application::Exit();
