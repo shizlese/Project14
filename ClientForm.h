@@ -28,7 +28,7 @@ namespace Project14 {
         }
 
     private:
-
+        System::Windows::Forms::ToolTip^ toolTip;
         System::Windows::Forms::TextBox^ textBoxMessage;
         System::Windows::Forms::Button^ buttonSend;
     private: System::Windows::Forms::ComboBox^ comboBoxChat;
@@ -36,11 +36,17 @@ namespace Project14 {
     private: System::Windows::Forms::Label^ label1;
 
     private: System::Windows::Forms::Button^ createChatButton;
-    private: System::Windows::Forms::Label^ CurrentChat;
+
     private: System::Windows::Forms::Button^ updateChatButton;
     private: System::Windows::Forms::Button^ buttonSendFile;
 
     private: System::Windows::Forms::OpenFileDialog^ openFileDialog1;
+    private: System::Windows::Forms::GroupBox^ groupBoxChat;
+    private: System::Windows::Forms::MenuStrip^ menuStrip1;
+    private: System::Windows::Forms::ToolStripMenuItem^ exitToolStripMenuItem;
+    private: System::Windows::Forms::ToolTip^ toolTip1;
+    private: System::Windows::Forms::HelpProvider^ helpProvider1;
+    private: System::Windows::Forms::ToolStripMenuItem^ toolStripMenuItemHelp;
     private: System::Windows::Forms::FlowLayoutPanel^ flowLayoutPanelChat;
 
 
@@ -50,43 +56,55 @@ namespace Project14 {
 
            void InitializeComponent()
            {
+               this->components = (gcnew System::ComponentModel::Container());
                System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(ClientForm::typeid));
                this->textBoxMessage = (gcnew System::Windows::Forms::TextBox());
                this->buttonSend = (gcnew System::Windows::Forms::Button());
                this->comboBoxChat = (gcnew System::Windows::Forms::ComboBox());
                this->label1 = (gcnew System::Windows::Forms::Label());
                this->createChatButton = (gcnew System::Windows::Forms::Button());
-               this->CurrentChat = (gcnew System::Windows::Forms::Label());
                this->updateChatButton = (gcnew System::Windows::Forms::Button());
                this->buttonSendFile = (gcnew System::Windows::Forms::Button());
                this->openFileDialog1 = (gcnew System::Windows::Forms::OpenFileDialog());
                this->flowLayoutPanelChat = (gcnew System::Windows::Forms::FlowLayoutPanel());
+               this->groupBoxChat = (gcnew System::Windows::Forms::GroupBox());
+               this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
+               this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+               this->toolTip1 = (gcnew System::Windows::Forms::ToolTip(this->components));
+               this->helpProvider1 = (gcnew System::Windows::Forms::HelpProvider());
+               this->toolStripMenuItemHelp = (gcnew System::Windows::Forms::ToolStripMenuItem());
+               this->groupBoxChat->SuspendLayout();
+               this->menuStrip1->SuspendLayout();
                this->SuspendLayout();
                // 
                // textBoxMessage
                // 
-               this->textBoxMessage->Location = System::Drawing::Point(135, 241);
+               this->textBoxMessage->Location = System::Drawing::Point(150, 392);
                this->textBoxMessage->Name = L"textBoxMessage";
-               this->textBoxMessage->Size = System::Drawing::Size(331, 20);
+               this->textBoxMessage->Size = System::Drawing::Size(441, 20);
                this->textBoxMessage->TabIndex = 0;
+               this->toolTip1->SetToolTip(this->textBoxMessage, L"Ввод сообщения");
                // 
                // buttonSend
                // 
-               this->buttonSend->Location = System::Drawing::Point(507, 241);
+               this->buttonSend->Location = System::Drawing::Point(632, 392);
                this->buttonSend->Name = L"buttonSend";
                this->buttonSend->Size = System::Drawing::Size(75, 20);
                this->buttonSend->TabIndex = 1;
                this->buttonSend->Text = L"Отправить";
+               this->toolTip1->SetToolTip(this->buttonSend, L"Отправить сообщение");
                this->buttonSend->UseVisualStyleBackColor = true;
                this->buttonSend->Click += gcnew System::EventHandler(this, &ClientForm::buttonSend_Click);
                // 
                // comboBoxChat
                // 
                this->comboBoxChat->FormattingEnabled = true;
-               this->comboBoxChat->Location = System::Drawing::Point(5, 27);
+               this->comboBoxChat->Location = System::Drawing::Point(17, 73);
                this->comboBoxChat->Name = L"comboBoxChat";
                this->comboBoxChat->Size = System::Drawing::Size(121, 21);
                this->comboBoxChat->TabIndex = 3;
+               this->toolTip1->SetToolTip(this->comboBoxChat, L"Выбрать чат \r\n Поиск происходит по введенному тексту \r\n Если текст пустой, то буд"
+                   L"ет выполняться поиск всех чатов");
                this->comboBoxChat->DropDown += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_DropDown);
                this->comboBoxChat->SelectedIndexChanged += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_SelectedIndexChanged);
                this->comboBoxChat->DropDownClosed += gcnew System::EventHandler(this, &ClientForm::comboBoxChat_DropDownClosed);
@@ -94,7 +112,7 @@ namespace Project14 {
                // label1
                // 
                this->label1->AutoSize = true;
-               this->label1->Location = System::Drawing::Point(34, 11);
+               this->label1->Location = System::Drawing::Point(44, 57);
                this->label1->Name = L"label1";
                this->label1->Size = System::Drawing::Size(65, 13);
                this->label1->TabIndex = 4;
@@ -102,39 +120,34 @@ namespace Project14 {
                // 
                // createChatButton
                // 
-               this->createChatButton->Location = System::Drawing::Point(5, 242);
+               this->createChatButton->Location = System::Drawing::Point(17, 392);
                this->createChatButton->Name = L"createChatButton";
-               this->createChatButton->Size = System::Drawing::Size(121, 20);
+               this->createChatButton->Size = System::Drawing::Size(118, 20);
                this->createChatButton->TabIndex = 6;
                this->createChatButton->Text = L"создать чат";
+               this->toolTip1->SetToolTip(this->createChatButton, L"Создать чат");
                this->createChatButton->UseVisualStyleBackColor = true;
                this->createChatButton->Click += gcnew System::EventHandler(this, &ClientForm::createChatButton_Click);
                // 
-               // CurrentChat
-               // 
-               this->CurrentChat->AutoSize = true;
-               this->CurrentChat->Location = System::Drawing::Point(132, 11);
-               this->CurrentChat->Name = L"CurrentChat";
-               this->CurrentChat->Size = System::Drawing::Size(0, 13);
-               this->CurrentChat->TabIndex = 7;
-               // 
                // updateChatButton
                // 
-               this->updateChatButton->Location = System::Drawing::Point(507, 2);
+               this->updateChatButton->Location = System::Drawing::Point(632, 29);
                this->updateChatButton->Name = L"updateChatButton";
                this->updateChatButton->Size = System::Drawing::Size(75, 22);
                this->updateChatButton->TabIndex = 8;
                this->updateChatButton->Text = L"обновить";
+               this->toolTip1->SetToolTip(this->updateChatButton, L"Обновить чат");
                this->updateChatButton->UseVisualStyleBackColor = true;
                this->updateChatButton->Click += gcnew System::EventHandler(this, &ClientForm::updateChatButton_Click);
                // 
                // buttonSendFile
                // 
                this->buttonSendFile->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"buttonSendFile.Image")));
-               this->buttonSendFile->Location = System::Drawing::Point(472, 242);
+               this->buttonSendFile->Location = System::Drawing::Point(597, 392);
                this->buttonSendFile->Name = L"buttonSendFile";
                this->buttonSendFile->Size = System::Drawing::Size(29, 20);
                this->buttonSendFile->TabIndex = 9;
+               this->toolTip1->SetToolTip(this->buttonSendFile, L"Отправить файл");
                this->buttonSendFile->UseVisualStyleBackColor = true;
                this->buttonSendFile->Click += gcnew System::EventHandler(this, &ClientForm::buttonSendFile_Click);
                // 
@@ -145,28 +158,88 @@ namespace Project14 {
                // flowLayoutPanelChat
                // 
                this->flowLayoutPanelChat->AutoScroll = true;
-               this->flowLayoutPanelChat->Location = System::Drawing::Point(135, 27);
+               this->flowLayoutPanelChat->Dock = System::Windows::Forms::DockStyle::Fill;
+               this->flowLayoutPanelChat->FlowDirection = System::Windows::Forms::FlowDirection::TopDown;
+               this->flowLayoutPanelChat->Location = System::Drawing::Point(3, 16);
                this->flowLayoutPanelChat->Name = L"flowLayoutPanelChat";
-               this->flowLayoutPanelChat->Size = System::Drawing::Size(447, 209);
+               this->flowLayoutPanelChat->Size = System::Drawing::Size(551, 310);
                this->flowLayoutPanelChat->TabIndex = 10;
+               // 
+               // groupBoxChat
+               // 
+               this->groupBoxChat->Controls->Add(this->flowLayoutPanelChat);
+               this->groupBoxChat->Location = System::Drawing::Point(150, 57);
+               this->groupBoxChat->Name = L"groupBoxChat";
+               this->groupBoxChat->Size = System::Drawing::Size(557, 329);
+               this->groupBoxChat->TabIndex = 11;
+               this->groupBoxChat->TabStop = false;
+               this->groupBoxChat->Text = L"Чат";
+               // 
+               // menuStrip1
+               // 
+               this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {
+                   this->exitToolStripMenuItem,
+                       this->toolStripMenuItemHelp
+               });
+               this->menuStrip1->Location = System::Drawing::Point(0, 0);
+               this->menuStrip1->Name = L"menuStrip1";
+               this->menuStrip1->Size = System::Drawing::Size(731, 24);
+               this->menuStrip1->TabIndex = 12;
+               this->menuStrip1->Text = L"menuStripChat";
+               // 
+               // exitToolStripMenuItem
+               // 
+               this->exitToolStripMenuItem->Name = L"exitToolStripMenuItem";
+               this->exitToolStripMenuItem->Size = System::Drawing::Size(54, 20);
+               this->exitToolStripMenuItem->Text = L"Выйти";
+               this->exitToolStripMenuItem->Click += gcnew System::EventHandler(this, &ClientForm::exitToolStripMenuItem_Click);
+               // 
+               // toolTip1
+               // 
+               this->toolTip1->Popup += gcnew System::Windows::Forms::PopupEventHandler(this, &ClientForm::toolTip1_Popup);
+               // 
+               // toolStripMenuItemHelp
+               // 
+               this->toolStripMenuItemHelp->Name = L"toolStripMenuItemHelp";
+               this->toolStripMenuItemHelp->Size = System::Drawing::Size(65, 20);
+               this->toolStripMenuItemHelp->Text = L"Справка";
+               this->toolStripMenuItemHelp->Click += gcnew System::EventHandler(this, &ClientForm::toolStripMenuItemHelp_Click);
                // 
                // ClientForm
                // 
-               this->ClientSize = System::Drawing::Size(622, 305);
-               this->Controls->Add(this->flowLayoutPanelChat);
+               this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::None;
+               this->ClientSize = System::Drawing::Size(731, 433);
+               this->Controls->Add(this->groupBoxChat);
                this->Controls->Add(this->buttonSendFile);
                this->Controls->Add(this->updateChatButton);
-               this->Controls->Add(this->CurrentChat);
                this->Controls->Add(this->createChatButton);
                this->Controls->Add(this->label1);
                this->Controls->Add(this->comboBoxChat);
                this->Controls->Add(this->textBoxMessage);
                this->Controls->Add(this->buttonSend);
+               this->Controls->Add(this->menuStrip1);
+               this->MainMenuStrip = this->menuStrip1;
+               this->MaximumSize = System::Drawing::Size(747, 472);
+               this->MinimumSize = System::Drawing::Size(747, 472);
                this->Name = L"ClientForm";
                this->Text = L"Чат";
+               this->groupBoxChat->ResumeLayout(false);
+               this->menuStrip1->ResumeLayout(false);
+               this->menuStrip1->PerformLayout();
                this->ResumeLayout(false);
                this->PerformLayout();
+               //helpprovider
+               //
+               //
+               this->helpProvider1->SetHelpNavigator(this, System::Windows::Forms::HelpNavigator::Topic);
+               this->helpProvider1->SetHelpString(this, "ClientForm");
 
+               // Добавьте справочную систему (HTML-файл) к вашему проекту
+               // Убедитесь, что файл справки имеет имя "ClientFormHelp.html" и находится в папке проекта
+               // Замените путь на фактический путь к файлу справки
+               String^ helpFilePath = System::IO::Path::Combine(Application::StartupPath, "ClientFormHelp.html");
+               this->helpProvider1->SetShowHelp(this, true);
+               this->helpProvider1->HelpNamespace = helpFilePath;
            }
            TcpClient^ CreateClient() {
                // Создание TCP-клиента для подключения к серверу
@@ -179,6 +252,8 @@ namespace Project14 {
                Label^ messageLabel = gcnew Label();
                messageLabel->Text = message;
                messageLabel->AutoSize = true;
+               messageLabel->Height = 30; // Установите желаемую высоту для Label
+               messageLabel->Margin = System::Windows::Forms::Padding(0, 5, 0, 5); // Установите желаемые отступы (верхний и нижний)
                this->flowLayoutPanelChat->Controls->Add(messageLabel);
            }
 
@@ -186,6 +261,8 @@ namespace Project14 {
                Button^ fileButton = gcnew Button();
                fileButton->Text = fileName;
                fileButton->AutoSize = true;
+               fileButton->Height = 30; // Установите желаемую высоту для Button
+               fileButton->Margin = System::Windows::Forms::Padding(0, 5, 0, 5); // Установите желаемые отступы (верхний и нижний)
                fileButton->Click += gcnew System::EventHandler(this, &ClientForm::OnFileButtonClick);
                this->flowLayoutPanelChat->Controls->Add(fileButton);
            }
@@ -399,7 +476,7 @@ namespace Project14 {
            }
            System::Void comboBoxChat_DropDownClosed(System::Object^ sender, System::EventArgs^ e) {
                // Обновление текста текущего чата после закрытия выпадающего списка
-               CurrentChat->Text = "Чат " + comboBoxChat->SelectedText;
+               groupBoxChat->Text = "Чат " + comboBoxChat->SelectedText;
            }
            System::Void updateChatButton_Click(System::Object^ sender, System::EventArgs^ e) {
                // Обновление истории чата
@@ -471,5 +548,15 @@ private: System::Void saveFileDialog1_FileOk(System::Object^ sender, System::Com
 }
 
 
+private: System::Void exitToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e) {
+    this->Hide();
+    Application::Exit();
+}
+private: System::Void toolTip1_Popup(System::Object^ sender, System::Windows::Forms::PopupEventArgs^ e) {
+}
+private: System::Void toolStripMenuItemHelp_Click(System::Object^ sender, System::EventArgs^ e) {
+    
+    System::Windows::Forms::Help::ShowHelp(this, helpProvider1->HelpNamespace, System::Windows::Forms::HelpNavigator::Topic, "ClientForm");
+}
 };
 }
