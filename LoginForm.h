@@ -195,7 +195,7 @@ namespace Project14 {
             try
             {
                 // Создание клиента TCP и получение сетевого потока
-                TcpClient^ client = gcnew TcpClient("127.0.0.1", 1234);
+                TcpClient^ client = gcnew TcpClient("0.0.0.0", 1234);
                 NetworkStream^ stream = client->GetStream();
 
                 // Формирование данных для входа
