@@ -344,10 +344,16 @@ private: System::Void OnFileButtonClick(System::Object^ sender, System::EventArg
        // Обработчик события нажатия на кнопку "Отправить сообщение"
        System::Void buttonSend_Click(System::Object^ sender, System::EventArgs^ e)
        {
+           if (textBoxMessage->Text != "") {
            // Формируем и отправляем запрос на отправку сообщения
            String^ message = "send_message_request:" + comboBoxChat->Text + ":" + Global::GlobalData::CurrentUser + ":" + textBoxMessage->Text;
            SendRequestAndGetResponse(message);
            textBoxMessage->Clear();
+           }
+           else
+           {
+               MessageBox::Show("Введите сообщение");
+           }
        }
        // Функция для приема данных файла с сервера
 private: array<Byte>^ ReceiveFileData(TcpClient^ client, int fileSize) {
@@ -416,6 +422,7 @@ private: System::Void RequestFileDownload(String^ fileName, String^ chatname) {
                 Console::WriteLine("File downloaded successfully. Size: {0} bytes.", fileSize);
             }
             else {
+                MessageBox::Show("Размер файла более 20мб.");
                 Console::WriteLine("File size exceeds the limit (20 MB).");
             }
         }

@@ -195,7 +195,7 @@ namespace Project14 {
             try
             {
                 // Создание клиента TCP и получение сетевого потока
-                TcpClient^ client = gcnew TcpClient("0.0.0.0", 1234);
+                TcpClient^ client = gcnew TcpClient("127.0.0.1", 1234);
                 NetworkStream^ stream = client->GetStream();
 
                 // Формирование данных для входа
@@ -279,17 +279,31 @@ namespace Project14 {
         // Обработчик события нажатия на кнопку входа
         void buttonLogin_Click(System::Object^ sender, System::EventArgs^ e)
         {
-            String^ username = textBoxUsername->Text;
-            String^ password = textBoxPassword->Text;
-            AttemptLogin(username, password);
+            if (textBoxUsername->Text != "" && textBoxPassword->Text != "")
+            {
+                String^ username = textBoxUsername->Text;
+                String^ password = textBoxPassword->Text;
+                AttemptLogin(username, password);
+            }
+            else
+            {
+                labelResultLogin->Text = "Введите логин и пароль";
+            }
         }
 
         // Обработчик события нажатия на кнопку регистрации
         void buttonRegister_Click(System::Object^ sender, System::EventArgs^ e)
         {
-            String^ username = textBoxUsername->Text;
-            String^ password = textBoxPassword->Text;
-            AttemptRegistration(username, password);
+            if (textBoxUsername->Text != "" && textBoxPassword->Text != "")
+            {
+				String^ username = textBoxUsername->Text;
+				String^ password = textBoxPassword->Text;
+				AttemptRegistration(username, password);
+			}
+			else
+			{
+				labelResultLogin->Text = "Введите логин и пароль";
+			}
         }
 private: System::Void toolStripMenuItemExit_Click(System::Object^ sender, System::EventArgs^ e) {
     this->Hide();
